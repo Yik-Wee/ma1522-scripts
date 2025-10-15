@@ -5,7 +5,16 @@ Just some matlab scripts, main one is symrref
 Find conditions when a symbolic matrix (containing unknown variables) is inconsistent, has unique solution or infinitely many solutions
 
 ## Copying
-TODO
+Either copy paste the code into a `*.m` file in your MATLAB workspace, or clone the repo:
+1. cd into your matlab workspace
+```
+cd YOUR_MATLAB_WORKSPACE_PATH
+```
+
+2. clone the repo
+```
+git clone https://github.com/Yik-Wee/ma1522-scripts.git
+```
 
 ## Usage
 ```
