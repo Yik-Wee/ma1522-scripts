@@ -61,7 +61,7 @@ end
             % solve for each unknown e.g. a*b==1 => a == 1/b or b == 1/a
             % Note in this example a and b cannot be 0
             for i = 1:length(unknowns)
-                print_indents(indent_level * indent_spaces);
+                % print_indents(indent_level * indent_spaces);
                 % fprintf("[debug solve0] solve(%s, %s)\n", string(leading == 0), string(unknowns(i)));
 
                 rhs = solve(leading == 0, unknowns(i));
