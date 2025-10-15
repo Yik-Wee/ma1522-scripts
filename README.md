@@ -18,11 +18,13 @@ git clone https://github.com/Yik-Wee/ma1522-scripts.git
 
 ## Usage
 ```
-symrref(A)
+symrref(A, show_rowops=true)
 ```
 
 - takes in a symbolic matrix
 - prints all possible RREFs of `A`, and their conditions
+Optional parameters:
+- show_rowops - true to print row operations, false otherwise
 
 ## Algorithm
 The idea is:
@@ -32,14 +34,14 @@ The idea is:
    2. sub each solution (`rhs`) into the matrix (`subs(A, unknowns[i], rhs)`)
    3. `symrref` on that substituted matrix
 
-## Example
+## Examples
+Example 1:
 ```matlab
 >> syms a; A = [1 -a 2-a -a-1 -a-1; 1 -a a -1 1; -1 -1 a-2 a+1 1; 1 a+2 1 a-1 3*a; 0 a+1 a-1 a 2*a+1]
->> symrref(A)
+>> symrref(A, false)
 ```
 Output:
 ```
-[debug solve0] solve(- a - 1 == 0, a)
 When [a == -1]
 [1, 1, 0, 0, 0]
 [0, 0, 1, 0, 0]
@@ -47,32 +49,46 @@ When [a == -1]
 [0, 0, 0, 0, 1]
 [0, 0, 0, 0, 0]
  
+^^^ a == -1
+====
 Else (a ~= -1):
-[debug solve0] solve(a - 1 == 0, a)
-When [a == 1]
+        When [a == 1]
 [1, 0, 1, 0, 0]
 [0, 1, 0, 0, 0]
 [0, 0, 0, 1, 0]
 [0, 0, 0, 0, 1]
 [0, 0, 0, 0, 0]
  
-Else (a ~= 1):
-[debug solve0] solve(-a == 0, a)
-When [a == 0]
+^^^ a ~= -1 AND a == 1
+====
+    Else (a ~= 1):
+                When [a == 0]
 [1, 0, 0, -1,  1]
 [0, 1, 0,  0,  0]
 [0, 0, 1,  0, -1]
 [0, 0, 0,  0,  0]
 [0, 0, 0,  0,  0]
  
-Else (a ~= 0):
+^^^ a ~= -1 AND a ~= 1 AND a == 0
+====
+        Else (a ~= 0):
 [1, 0, 0, 0, -(- a^3 + a + 2)/(a^2 - 1)]
 [0, 1, 0, 0,                  a/(a + 1)]
 [0, 0, 1, 0,                  1/(a - 1)]
 [0, 0, 0, 1,                          1]
 [0, 0, 0, 0,                          0]
+ 
+^^^ a ~= -1 AND a ~= 1 AND a ~= 0
+====
 ```
 From above,
 - when `a == -1` and `a == 1`, the system is inconsistent
 - when `a == 0` the system has infinitely many solutions
 - when `a != -1` and `a != 1` and `a != 0` the solution has a unique solution
+
+Example 2:
+```matlab
+>> syms a b; A = [1 1-a  0 b-3 b-1; 1 2 a+b -1 2; 1 a+3 a+b 1-b 4-b; 1 a -(b+a) b-3 b-2; 0 a+1 a+b 2-b 3-b]
+>> symrref(A)
+```
+Very long output with some redundant cases
