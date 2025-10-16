@@ -4,21 +4,29 @@ arguments
     show_rowops logical = true
     indent_spaces (1, 1) = 4
 end
-    symrref_helper(A, show_rowops, 0, indent_spaces, [])
+    if class(A) ~= "sym"
+        error("Matrix must be symbolic. try using `sym` instead");
+    end
+
+    if size(A, 1) == 0 && size(A, 2) == 0
+        disp(A);
+        return
+    end
+
+    symrref_helper(A, 1, 1, show_rowops, 0, indent_spaces, [])
 end
 
-function [] = symrref_helper(A, show_rowops, indent_level, indent_spaces, conditions)
+function [] = symrref_helper(A, r, c, show_rowops, indent_level, indent_spaces, conditions)
 % A must be a symbolic matrix
 arguments
     A (:, :) {mustBeMatrix}
+    r (1, 1)
+    c (1, 1)
     show_rowops logical = true
     indent_level (1, 1) = 0
     indent_spaces (1, 1) = 4
     conditions(1,:) = []
 end
-    r = 1;
-    c = 1;
-
     [m, n] = size(A);
 
     while r <= m && c <= n
@@ -61,9 +69,6 @@ end
             % solve for each unknown e.g. a*b==1 => a == 1/b or b == 1/a
             % Note in this example a and b cannot be 0
             for i = 1:length(unknowns)
-                % print_indents(indent_level * indent_spaces);
-                % fprintf("[debug solve0] solve(%s, %s)\n", string(leading == 0), string(unknowns(i)));
-
                 rhs = solve(leading == 0, unknowns(i));
                 if isempty(rhs)  % no solution - continue
                     continue
@@ -78,6 +83,8 @@ end
 
                     B = subs(A, unknowns(i), rhs(j));
                     symrref_helper(B, ...
+                        r, ...
+                        c, ...
                         show_rowops, ...
                         indent_level+1, ...
                         indent_spaces, ...
@@ -97,12 +104,15 @@ end
         end
 
         % leading not 0, continue with normal gaussian elimination
-        % make our leading term 1
-        if show_rowops
-            print_indents(indent_level * indent_spaces);
-            fprintf("=> (%s)*R_%d\n", string(1 / leading), r);
+        % make our leading term 1 (when our leading term is 1 we don't
+        % need to divide our row by 1, it does nothing)
+        if leading ~= 1
+            if show_rowops
+                print_indents(indent_level * indent_spaces);
+                fprintf("=> (%s)*R_%d\n", string(1 / leading), r);
+            end
+            A(r, :) = simplify((1 / leading) * A(r, :));
         end
-        A(r, :) = simplify((1 / leading) * A(r, :));
 
         % make the other terms in the column 0
         for i = 1:m
@@ -151,16 +161,3 @@ end
 function [] = print_indents(n_spaces)
     fprintf("%s", indent_string(n_spaces));
 end
-
-% function [] = print_matrix_indented(A, indent_level, indent_spaces)
-% arguments
-%     A
-%     indent_level = 0
-%     indent_spaces = 2
-% end
-%     m = size(A, 1);
-%     for i = 1:m
-%         print_indents(indent_level * indent_spaces);
-%         disp(A(i,:));
-%     end
-% end
