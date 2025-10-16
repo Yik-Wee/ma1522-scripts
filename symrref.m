@@ -132,7 +132,11 @@ end
 
     % how do you properly print a matrix with indentation in matlab ????
     disp(A);
-    disp("^^^ " + join(conditions, " AND "));
+    if isempty(conditions)
+        disp("^^^ (no conditions)");
+    else
+        disp("^^^ " + join(conditions, " AND "));
+    end
     disp("====");
 end
 
