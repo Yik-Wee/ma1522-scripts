@@ -10,5 +10,5 @@ arguments (Output)
     output
 end
 
-    output = isSpanSubset(S, T) & isSpanSubset(T, S)
+    output = isSpanSubset(S, T) & isSpanSubset(T, S);
 end
