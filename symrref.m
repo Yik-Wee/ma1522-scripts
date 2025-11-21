@@ -79,8 +79,18 @@ end
                 for j = 1:length(rhs)
                     print_indents(indent_level * indent_spaces);
                     curr_condition = string(unknowns(i) == rhs(j));
+
+                    % check if we've already checked for this 
+                    % divide by 0 case, e.g. if we already checked a == 0
+                    % meaning a ~= 0 now, then don't check a == 0 again
+                    % lousy way of doing this but whatever lol
+                    if any(string(conditions(:)) == string(unknowns(i) ~= rhs(j)))
+                        % disp("Skipping [" + curr_condition + "]");
+                        continue
+                    end
                     disp("When [" + curr_condition + "]");
 
+                    % A, unknowns(i), rhs(j), conditions
                     B = subs(A, unknowns(i), rhs(j));
                     symrref_helper(B, ...
                         r, ...
