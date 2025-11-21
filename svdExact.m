@@ -74,5 +74,8 @@ end
     % full QR to "pad" with more orthonormal vectors (not in basis)
     [U, ~] = qr(U);
 
-    % return [U, S, V];
+    % simplify in case not already simplified
+    U = simplify(U);
+    S = simplify(S);
+    V = simplify(V);
 end
