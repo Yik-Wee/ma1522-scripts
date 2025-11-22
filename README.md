@@ -131,7 +131,7 @@ Else (a ~= -1):
 ====
 ```
 From above,
-- when `a == -1` and `a == 1`, the system is inconsistent
+- when `a == -1` or `a == 1`, the system is inconsistent
 - when `a == 0` the system has infinitely many solutions
 - when `a != -1` and `a != 1` and `a != 0` the solution has a unique solution
 
@@ -140,4 +140,24 @@ Example 2:
 >> syms a b; A = [1 1-a  0 b-3 b-1; 1 2 a+b -1 2; 1 a+3 a+b 1-b 4-b; 1 a -(b+a) b-3 b-2; 0 a+1 a+b 2-b 3-b]
 >> symrref(A)
 ```
-Very long output with some redundant cases
+
+Example 3:
+```matlab
+>> syms a; A = [2 a 1 1 2; 1 1 a 1 1+a; 1 1 1 a a; 1 2 2 a+1 a+3]
+>> symrref(A, false)
+```
+
+Example 4:
+```matlab
+>> syms a; A = [a 0 1/a; 0 a 1/a]
+>> symrref(A, false)
+When [a == 0]
+[[a == 0 is impossible]]
+    When [a == 0]
+    [[a == 0 is impossible]]
+[1, 0, 1/a^2]
+[0, 1, 1/a^2]
+ 
+^^^ (no conditions)
+====
+```

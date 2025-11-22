@@ -77,28 +77,42 @@ end
                 % can have many solutions, e.g. b^2 - 4 == 0
                 % then sub (b == 2) then (b == -2)
                 for j = 1:length(rhs)
-                    print_indents(indent_level * indent_spaces);
                     curr_condition = string(unknowns(i) == rhs(j));
 
-                    % check if we've already checked for this 
-                    % divide by 0 case, e.g. if we already checked a == 0
-                    % meaning a ~= 0 now, then don't check a == 0 again
-                    % lousy way of doing this but whatever lol
-                    if any(string(conditions(:)) == string(unknowns(i) ~= rhs(j)))
-                        % disp("Skipping [" + curr_condition + "]");
+                    % don't check cases that are already checked
+                    % e.g. if we are dividing by a, we check if a == 0
+                    % but maybe we already checked a == 0 case, so
+                    % now a ~= 0 and the a == 0 check is redundant
+                    is_cond_met = any(string(conditions) == string(unknowns(i) ~= rhs(j)));
+                    if is_cond_met
                         continue
                     end
+                    print_indents(indent_level * indent_spaces);
                     disp("When [" + curr_condition + "]");
 
-                    % A, unknowns(i), rhs(j), conditions
-                    B = subs(A, unknowns(i), rhs(j));
-                    symrref_helper(B, ...
-                        r, ...
-                        c, ...
-                        show_rowops, ...
-                        indent_level+1, ...
-                        indent_spaces, ...
-                        [conditions, curr_condition]);
+                    % try-catch to fix problem e.g.
+                    % [ a 0 1/a
+                    %   0 a 1/a ]
+                    % doing subs(A, a, 0) will cause divide by 0 error
+                    try
+                        B = subs(A, unknowns(i), rhs(j));
+                        symrref_helper(B, ...
+                            r, ...
+                            c, ...
+                            show_rowops, ...
+                            indent_level+1, ...
+                            indent_spaces, ...
+                            [conditions, curr_condition]);
+                    catch ME
+                        switch ME.identifier
+                            case 'symbolic:kernel:DivisionByZero'
+                                print_indents(indent_level * indent_spaces);
+                                disp("[[" + curr_condition + " is impossible]]");
+                                continue
+                            otherwise
+                                rethrow(ME);
+                        end
+                    end
 
                     % now expr != 0 (since we have recursively solved the
                     % case when expr == 0)
