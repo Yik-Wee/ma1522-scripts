@@ -41,23 +41,31 @@ end
         end
     end
 
+    % remove zeros from eigenvalues
+    eigenvalues = eigenvalues(eigenvalues ~= 0);
+    % we can guarantee that r <= n
+    r = length(eigenvalues);
+
     % compute singular values until 0 (singular values always >= 0)
     % Note: sqrt() will return (sqrt(D_{i,j})) where D_{i,j} are entries 
     % in D
-    S = diag(sqrt(eigenvalues));
-    n_S = size(S, 1);
+    S = diag(sqrt(eigenvalues));  % r x r matrix
     [m, n] = size(A);
-    % pad by adding extra m-n zero rows (or n-m zero cols)
-    if m > n
-        for i = 1:m-n
-            S(n_S+i, :) = zeros(1, n_S);
-        end
+
+    % edge case: all singular values are 0
+    if r == 0
+        S = sym(zeros(m, n));
     else
-        for i = 1:n-m
-            S(:, n_S+i) = zeros(n_S, 1);
+        if r < n
+            S(:, r+1:n) = zeros(r, n-r);
         end
+        % we now have n columns
+
+        if r < m
+            S(r+1:m, :) = zeros(m-r, n);
+        end
+        % we now have m columns
     end
-    % S has been obtained
 
     % Gram-Schmidt on P to get V (n x n)
     [V, ~] = qr(sym(P));
@@ -65,10 +73,19 @@ end
     % compute each u_i
     U = sym([]);
     singularvalues = sqrt(eigenvalues);
-    for i = 1:size(V, 1)
+    for i = 1:r
         v_i = V(:, i);
         sigma_i = singularvalues(i, :);
-        U(:, i) = 1/sigma_i * A * v_i;
+        if sigma_i ~= 0
+            u_i = 1/sigma_i * A * v_i;
+            U(:, i) = u_i;
+        end
+    end
+
+    % edge case: all eigenvalues are 0 -> U 0x0
+    % make U the standard basis for R^m
+    if r == 0
+        U = sym(eye(m));
     end
 
     % full QR to "pad" with more orthonormal vectors (not in basis)
