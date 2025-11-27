@@ -1,6 +1,13 @@
 # MA1522 scripts
 Just some matlab scripts, main one is symrref
 
+# svdExact
+Usage:
+```
+>> [U S V] = svdExact(sym(A))
+```
+> Note: use `sym(A)`.
+
 # symrref
 Find conditions when a symbolic matrix (containing unknown variables) is inconsistent, has unique solution or infinitely many solutions
 
