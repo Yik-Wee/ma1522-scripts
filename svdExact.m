@@ -1,5 +1,6 @@
 function [U, S, V] = svdExact(A)
-%SVDEXACT Exact SVD of A, such that U*S*V == A. Use sym(A) to get exact
+%SVDEXACT Exact SVD of A, such that U*S*V == A. 
+% NOTE: Use sym(A) to get exact
 arguments (Input)
     A (:, :)
 end
@@ -93,6 +94,6 @@ end
 
     % simplify in case not already simplified
     U = simplify(U);
-    S = simplify(S);
+    % S = simplify(S);
     V = simplify(V);
 end
